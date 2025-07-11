@@ -1,0 +1,210 @@
+CREATE TABLE Brigadas (
+  idBrigada INT NOT NULL,
+  nombreBrigada VARCHAR(100) NOT NULL,
+  PRIMARY KEY (idBrigada)
+);
+
+CREATE TABLE Area (
+  nombreArea VARCHAR(100) NOT NULL,
+  idArea INT NOT NULL,
+  PRIMARY KEY (idArea)
+);
+
+CREATE TABLE curso (
+  idCurso INT NOT NULL,
+  Objetivos TEXT NOT NULL,
+  DescContenidos TEXT NOT NULL,
+  idArea INT NOT NULL,
+  PRIMARY KEY (idCurso),
+  FOREIGN KEY (idArea) REFERENCES Area(idArea)
+);
+
+CREATE TABLE Institucion (
+  NombreIE VARCHAR(100) NOT NULL,
+  idInstitucion INT NOT NULL,
+  CodigoLocal INT NOT NULL,
+  Turno VARCHAR(50) NOT NULL,
+  UGEL INT NOT NULL,
+  DireccionLocal VARCHAR(200) NOT NULL,
+  Telefono VARCHAR(20) NOT NULL,
+  CorreoInstitucion VARCHAR(100) NOT NULL,
+  CodigoModular INT NOT NULL,
+  PRIMARY KEY (idInstitucion)
+);
+
+CREATE TABLE Grado (
+  idGrado INT NOT NULL,
+  NombreGrado VARCHAR(50) NOT NULL,
+  nivel INT NOT NULL,
+  idInstitucion INT NOT NULL,
+  PRIMARY KEY (idGrado),
+  FOREIGN KEY (idInstitucion) REFERENCES Institucion(idInstitucion)
+);
+
+CREATE TABLE Seccion (
+  idSeccion INT NOT NULL,
+  idGrado INT NOT NULL,
+  PRIMARY KEY (idSeccion),
+  FOREIGN KEY (idGrado) REFERENCES Grado(idGrado)
+);
+
+CREATE TABLE AñoEscolar (
+  idAño INT NOT NULL,
+  FechaFin DATE NOT NULL,
+  FechaInicio DATE NOT NULL,
+  idInstitucion INT NOT NULL,
+  PRIMARY KEY (idAño),
+  FOREIGN KEY (idInstitucion) REFERENCES Institucion(idInstitucion)
+);
+
+CREATE TABLE Persona (
+  idPersona INT NOT NULL AUTO_INCREMENT,	
+  DNI VARCHAR(20) NOT NULL,
+  Nombres VARCHAR(100) NOT NULL,
+  Apellido_Paterno VARCHAR(50) NOT NULL,
+  Apellido_Materno VARCHAR(50) NOT NULL,
+  Direccion VARCHAR(200) NOT NULL,
+  Sexo VARCHAR(10) NOT NULL,
+  FechaNac DATE NOT NULL,
+  telefono VARCHAR(20) NOT NULL,
+  contactoEmergencia_idPersona INT NOT NULL,
+  PRIMARY KEY (idPersona),
+  FOREIGN KEY (contactoEmergencia_idPersona) REFERENCES Persona(idPersona)
+);
+
+CREATE TABLE No_Estudiante (
+  correo VARCHAR(100) NOT NULL,
+  gradoInstruccion VARCHAR(50) NOT NULL,
+  idPersona INT NOT NULL,
+  PRIMARY KEY (idPersona),
+  FOREIGN KEY (idPersona) REFERENCES Persona(idPersona)
+);
+
+CREATE TABLE Estudiante (
+  codAlumno VARCHAR(20) NOT NULL,
+  idPersona INT NOT NULL,
+  PRIMARY KEY (idPersona),
+  FOREIGN KEY (idPersona) REFERENCES Persona(idPersona),
+  UNIQUE KEY (codAlumno)
+);
+
+CREATE TABLE Empleado (
+  codEmpleado VARCHAR(20) NOT NULL,
+  CondicionGrupoRiesgo VARCHAR(50) NOT NULL,
+  cargo VARCHAR(50) NOT NULL,
+  Salario DECIMAL(10,2) NOT NULL,
+  idPersona INT NOT NULL,
+  PRIMARY KEY (idPersona),
+  FOREIGN KEY (idPersona) REFERENCES No_Estudiante(idPersona),
+  UNIQUE KEY (codEmpleado)
+);
+
+CREATE TABLE PPFF (
+  Vive VARCHAR(5) NOT NULL,
+  Ocupacion VARCHAR(50) NOT NULL,
+  idPersona INT NOT NULL,
+  PRIMARY KEY (idPersona),
+  FOREIGN KEY (idPersona) REFERENCES No_Estudiante(idPersona)
+);
+
+CREATE TABLE Administrativo (
+  idPersona INT NOT NULL,
+  PRIMARY KEY (idPersona),
+  FOREIGN KEY (idPersona) REFERENCES Empleado(idPersona)
+);
+
+CREATE TABLE Academico (
+  Modalidad VARCHAR(20) NOT NULL,
+  idPersona INT NOT NULL,
+  PRIMARY KEY (idPersona),
+  FOREIGN KEY (idPersona) REFERENCES Empleado(idPersona)
+);
+
+CREATE TABLE Auxiliar (
+  idPersona INT NOT NULL,
+  idSeccion INT NOT NULL,
+  PRIMARY KEY (idPersona),
+  FOREIGN KEY (idPersona) REFERENCES Academico(idPersona),
+  FOREIGN KEY (idSeccion) REFERENCES Seccion(idSeccion)
+);
+
+CREATE TABLE Docente (
+  idPersona INT NOT NULL,
+  idSeccion INT NOT NULL,
+  PRIMARY KEY (idPersona),
+  FOREIGN KEY (idPersona) REFERENCES Academico(idPersona),
+  FOREIGN KEY (idSeccion) REFERENCES Seccion(idSeccion)
+);
+
+CREATE TABLE matricula (
+  idMatricula INT NOT NULL AUTO_INCREMENT,
+  fechaMatricula DATE NOT NULL,
+  idPersona INT NOT NULL,
+  idSeccion INT NOT NULL,
+  PRIMARY KEY (idMatricula),
+  FOREIGN KEY (idPersona) REFERENCES Estudiante(idPersona),
+  FOREIGN KEY (idSeccion) REFERENCES Seccion(idSeccion)
+);
+
+CREATE TABLE DocenteImparteCurso (
+  idImparte INT NOT NULL AUTO_INCREMENT,
+  idPersona INT NOT NULL,
+  idSeccion INT NOT NULL,
+  idCurso INT NOT NULL,
+  PRIMARY KEY (idImparte),
+  FOREIGN KEY (idPersona) REFERENCES Docente(idPersona),
+  FOREIGN KEY (idSeccion) REFERENCES Seccion(idSeccion),
+  FOREIGN KEY (idCurso) REFERENCES curso(idCurso)
+);
+
+CREATE TABLE RegistroAsistencia (
+  idAsistenciaMes INT NOT NULL AUTO_INCREMENT,
+  Estado VARCHAR(20) NOT NULL,
+  FechaAsistencia DATE NOT NULL,
+  Hora_Llegada TIME NOT NULL,
+  idMatricula INT NOT NULL,
+  idAño INT NOT NULL,
+  PRIMARY KEY (idAsistenciaMes),
+  FOREIGN KEY (idMatricula) REFERENCES matricula(idMatricula),
+  FOREIGN KEY (idAño) REFERENCES AñoEscolar(idAño)
+);
+
+CREATE TABLE RegNotas (
+  Nota DECIMAL(4,2) NOT NULL,
+  idRegNota INT NOT NULL AUTO_INCREMENT,
+  FechaEvaluacion DATE NOT NULL,
+  TipoEvaluacion VARCHAR(20) NOT NULL,
+  Bimestre INT NOT NULL,
+  idMatricula INT NOT NULL,
+  idImparte INT NOT NULL,
+  PRIMARY KEY (idRegNota),
+  FOREIGN KEY (idMatricula) REFERENCES matricula(idMatricula),
+  FOREIGN KEY (idImparte) REFERENCES DocenteImparteCurso(idImparte)
+);
+
+CREATE TABLE ClinicaPreferida (
+  idClinica INT NOT NULL AUTO_INCREMENT,
+  nombreClinica VARCHAR(100) NOT NULL,
+  idPersona INT NOT NULL,
+  PRIMARY KEY (idClinica),
+  FOREIGN KEY (idPersona) REFERENCES Estudiante(idPersona)
+);
+
+CREATE TABLE pertenece (
+  CargoBrigada VARCHAR(50) NOT NULL,
+  idBrigada INT NOT NULL,
+  idPersona INT NOT NULL,
+  PRIMARY KEY (idBrigada, idPersona),
+  FOREIGN KEY (idBrigada) REFERENCES Brigadas(idBrigada),
+  FOREIGN KEY (idPersona) REFERENCES Empleado(idPersona)
+);
+
+CREATE TABLE apoderado (
+  Parentesco VARCHAR(20) NOT NULL,
+  viveConEstudiante VARCHAR(5) NOT NULL,
+  idPersonaEst INT NOT NULL,
+  idPersonaPPFF INT NOT NULL,
+  PRIMARY KEY (idPersonaEst, idPersonaPPFF),
+  FOREIGN KEY (idPersonaEst) REFERENCES Estudiante(idPersona),
+  FOREIGN KEY (idPersonaPPFF) REFERENCES PPFF(idPersona)
+);

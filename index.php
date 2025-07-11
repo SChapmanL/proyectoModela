@@ -14,7 +14,7 @@
         <div class="button-container">
             <button class="menu-button">Gestion de alumno</button>
             <a href="Apoderado.php" class="menu-button">Gestion de apoderado</a>
-            <button class="menu-button">Gestion de personal</button>
+            <a href="Empleado.php" class="menu-button">Gestion de personal</a>
             <button class="menu-button">Asistencia</button>
             <button class="menu-button">Matricula</button>
             <button class="menu-button">Notas</button>
