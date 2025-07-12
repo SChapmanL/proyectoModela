@@ -12,12 +12,12 @@
             <h1>Menu principal</h1>
         </div>
         <div class="button-container">
-            <button class="menu-button">Gestion de alumno</button>
-            <a href="Apoderado.php" class="menu-button">Gestion de apoderado</a>
+            <a href="RegistroPersonas.php" class="menu-button">Gestion de alumno</a>
+            <a class="menu-button">Gestion de apoderado</a>
             <a href="Empleado.php" class="menu-button">Gestion de personal</a>
-            <button class="menu-button">Asistencia</button>
-            <button class="menu-button">Matricula</button>
-            <button class="menu-button">Notas</button>
+            <a href="RegistroAsistencia.php" class="menu-button">Asistencia</a>
+            <a href="Matricula.php" class="menu-button">Matricula</a>
+            <a href="RegistroNotas.php" class="menu-button">Notas</a>
         </div>
         <div class="logout-container">
             <button class="logout-button">Salir</button>

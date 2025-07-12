@@ -22,12 +22,37 @@ if (isset($_POST['add'])) {
 
 // Obtener asistencias para mostrar en tabla
 $asistencias = [];
-$result = $conn->query("SELECT * FROM RegistroAsistencia");
+$sql_select = "SELECT ra.*, p.Nombres, p.Apellido_Paterno, EXTRACT(YEAR FROM ae.FechaInicio) AS Anio
+               FROM RegistroAsistencia ra
+               JOIN matricula m ON ra.idMatricula = m.idMatricula
+               JOIN Estudiante e ON m.idPersona = e.idPersona
+               JOIN Persona p ON e.idPersona = p.idPersona
+               JOIN AñoEscolar ae ON ra.idAño = ae.idAño";
+
+$where_clause = "";
+$params = [];
+$param_types = "";
+
+if (isset($_GET['filter_idSeccion']) && $_GET['filter_idSeccion'] != '') {
+    $idSeccion_filter = $_GET['filter_idSeccion'];
+    $sql_select .= " JOIN Seccion s ON m.idSeccion = s.idSeccion WHERE s.idSeccion = ?";
+    $params[] = $idSeccion_filter;
+    $param_types .= "i";
+}
+
+$stmt_select = $conn->prepare($sql_select);
+if (!empty($params)) {
+    $stmt_select->bind_param($param_types, ...$params);
+}
+$stmt_select->execute();
+$result = $stmt_select->get_result();
+
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $asistencias[] = $row;
     }
 }
+$stmt_select->close();
 ?>
 
 <!DOCTYPE html>
@@ -36,6 +61,7 @@ if ($result->num_rows > 0) {
     <meta charset="UTF-8">
     <title>Registro de Asistencia</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -134,12 +160,12 @@ if ($result->num_rows > 0) {
                     <input type="date" name="FechaAsistencia" required>
                     <input type="time" name="Hora_Llegada" required>
 
-                    <select name="idMatricula" required>
-                        <option value="">Seleccione Matrícula</option>
+                    <select name="idMatricula" id="idMatriculaSelect" required>
+                        <option value="">Seleccione Estudiante</option>
                         <?php
-                        $matriculas = $conn->query("SELECT idMatricula FROM matricula");
+                        $matriculas = $conn->query("SELECT m.idMatricula, p.Nombres, p.Apellido_Paterno FROM matricula m JOIN Estudiante e ON m.idPersona = e.idPersona JOIN Persona p ON e.idPersona = p.idPersona");
                         while ($row = $matriculas->fetch_assoc()) {
-                            echo "<option value='{$row['idMatricula']}'>Matrícula: {$row['idMatricula']}</option>";
+                            echo "<option value='{$row['idMatricula']}'>{$row['Nombres']} {$row['Apellido_Paterno']}</option>";
                         }
                         ?>
                     </select>
@@ -147,9 +173,9 @@ if ($result->num_rows > 0) {
                     <select name="idAño" required>
                         <option value="">Seleccione Año Escolar</option>
                         <?php
-                        $años = $conn->query("SELECT idAño FROM AñoEscolar");
+                        $años = $conn->query("SELECT idAño, FechaInicio FROM AñoEscolar");
                         while ($row = $años->fetch_assoc()) {
-                            echo "<option value='{$row['idAño']}'>Año: {$row['idAño']}</option>";
+                            echo "<option value='{$row['idAño']}'>Año: " . date('Y', strtotime($row['FechaInicio'])) . "</option>";
                         }
                         ?>
                     </select>
@@ -160,6 +186,20 @@ if ($result->num_rows > 0) {
 
         <div class="table-section">
             <h2>Asistencias Registradas</h2>
+            <form action="RegistroAsistencia.php" method="GET" style="margin-bottom: 20px;">
+                <label for="filter_idSeccion">Filtrar por Sección:</label>
+                <select name="filter_idSeccion" id="filter_idSeccion">
+                    <option value="">Todas las Secciones</option>
+                    <?php
+                    $secciones = $conn->query("SELECT s.idSeccion, g.NombreGrado FROM Seccion s JOIN Grado g ON s.idGrado = g.idGrado");
+                    while ($row = $secciones->fetch_assoc()) {
+                        $selected = (isset($_GET['filter_idSeccion']) && $_GET['filter_idSeccion'] == $row['idSeccion']) ? 'selected' : '';
+                        echo "<option value='{$row['idSeccion']}' {$selected}>{$row['NombreGrado']} (Sección: {$row['idSeccion']})</option>";
+                    }
+                    ?>
+                </select>
+                <input type="submit" value="Filtrar" class="form-submit-button" style="width: auto; padding: 8px 15px; margin-left: 10px;">
+            </form>
             <table>
                 <thead>
                     <tr>
@@ -167,8 +207,8 @@ if ($result->num_rows > 0) {
                         <th>Estado</th>
                         <th>Fecha</th>
                         <th>Hora Llegada</th>
-                        <th>Matrícula</th>
-                        <th>Año Escolar</th>
+                        <th>Estudiante</th>
+                        <th>Año</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -181,8 +221,8 @@ if ($result->num_rows > 0) {
                                 <td><?= htmlspecialchars($asistencia['Estado']) ?></td>
                                 <td><?= htmlspecialchars($asistencia['FechaAsistencia']) ?></td>
                                 <td><?= htmlspecialchars($asistencia['Hora_Llegada']) ?></td>
-                                <td><?= htmlspecialchars($asistencia['idMatricula']) ?></td>
-                                <td><?= htmlspecialchars($asistencia['idAño']) ?></td>
+                                <td><?= htmlspecialchars($asistencia['Nombres']) ?> <?= htmlspecialchars($asistencia['Apellido_Paterno']) ?></td>
+                                <td><?= htmlspecialchars($asistencia['Anio']) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -191,5 +231,12 @@ if ($result->num_rows > 0) {
             <a href="index.php" class="back-button">Volver al Menú Principal</a>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#idMatriculaSelect').select2();
+        });
+    </script>
 </body>
 </html>

@@ -43,7 +43,7 @@ body {
     cursor: pointer;
     border-radius: 12px;
     border: none;
-    width: 100%; /* make buttons fill container */
+    width: 100%;
 }
 
 .logout-container {
