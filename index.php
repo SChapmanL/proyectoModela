@@ -13,7 +13,7 @@
         </div>
         <div class="button-container">
             <a href="RegistroPersonas.php" class="menu-button">Gestion de alumno</a>
-            <a class="menu-button">Gestion de apoderado</a>
+            <a href="Apoderado.php" class="menu-button">Gestion de apoderado</a>
             <a href="Empleado.php" class="menu-button">Gestion de personal</a>
             <a href="RegistroAsistencia.php" class="menu-button">Asistencia</a>
             <a href="Matricula.php" class="menu-button">Matricula</a>
