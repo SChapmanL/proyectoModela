@@ -1,0 +1,93 @@
+body {
+            font-family: Arial, sans-serif;
+            background-color: #eef1f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 25px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 30px;
+        }
+        .form-section, .table-section {
+            flex: 1;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .form-grid input,
+        .form-grid select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .form-submit-button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .form-submit-button:hover {
+            background-color: #218838;
+        }
+        .update-button {
+            background-color: #007bff;
+        }
+        .update-button:hover {
+            background-color: #0069d9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.95em;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+            padding: 10px;
+            color: #333;
+        }
+        td {
+            padding: 8px;
+            text-align: left;
+        }
+        .action-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .action-link:hover {
+            text-decoration: underline;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }

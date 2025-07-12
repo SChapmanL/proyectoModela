@@ -43,7 +43,8 @@ body {
     cursor: pointer;
     border-radius: 12px;
     border: none;
-    width: 100%;
+    width: 80%;
+    margin: auto;
 }
 
 .logout-container {
