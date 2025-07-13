@@ -70,7 +70,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['registrar'])) {
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<<<<<<< HEAD
     <!-- ... (head sin cambios) -->
+=======
+    <meta charset="UTF-8">
+    <title>Registro de Estudiantes</title>
+    <link rel="stylesheet" href="css/registroestudiantes_style.css">
+>>>>>>> 469bfab725914f7a1b949ee3530c26db71809b5b
 </head>
 <body>
     <!-- ... (cuerpo del HTML sin cambios hasta el final) -->
