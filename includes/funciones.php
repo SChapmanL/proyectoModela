@@ -7,12 +7,9 @@ function get_db_connection() {
         return $db;
     } catch (\Throwable $th) {
         var_dump($th);
-        exit(); // Exit if connection fails
+        exit();
     }
 }
-
-// The existing functions might need to be refactored to use get_db_connection() if they are still needed.
-// For now, I'm just adding the new function.
 
 function obtener_servicios() {
     try {
@@ -37,7 +34,6 @@ function obtener_servicios() {
 }
 
 function obtener_apoderados() {
-    // Try-catch: ejecuta todas las lineas de codigo dentro del try, si hay un error en alguna, el bloque catch indica donde está el error
     try {
         // Importar credenciales
         require 'database.php';
@@ -47,19 +43,11 @@ function obtener_apoderados() {
 
         // Realizar consulta
         $query = mysqli_query($db, $sql);
-        return $query;        
-        //Acceder a resultados
-        // echo '<pre>';
-        // var_dump( mysqli_fetch_assoc($query) );
-        // echo '</pre>';
-        // Cerrar conexión
+        return $query;
         $resultado = mysqli_close($db);
     } catch (\Throwable $th) {
         var_dump($th);
         //throw $th;
     }
 }
-
-
-// obtener_servicios(); // This line should probably be removed or called conditionally if it's not meant to run on every include.
 ?>

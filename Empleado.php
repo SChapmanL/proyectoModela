@@ -124,7 +124,7 @@ if (isset($_POST['add'])) {
             }
         }
         $conn->commit();
-        header('Location: Empleado.php'); // Redirect to refresh page
+        header('Location: Empleado.php');
         exit();
     } catch (mysqli_sql_exception $e) {
         $conn->rollback();
@@ -136,7 +136,7 @@ if (isset($_POST['add'])) {
     }
 }
 
-// 2. Read/Fetch Empleado for Update
+//READ
 if (isset($_GET['edit'])) {
     $id = $_GET['edit'];
     // Un join de Persona, No_Estudiante, Empleado, Academico, Docente, Auxiliar
@@ -282,7 +282,7 @@ if (isset($_POST['update'])) {
 // 4. Delete Empleado
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
-    // Delete from Auxiliar table first si existe
+    // Delete from Auxiliar table si existe
     // para hacer la correcta eliminacion va al reves
     $sql_delete_auxiliar = "DELETE FROM Auxiliar WHERE idPersona = ?";
     $stmt_delete_auxiliar = $conn->prepare($sql_delete_auxiliar);

@@ -251,7 +251,7 @@ if (isset($_POST['add_persona'])) {
                 // Quitar el atributo required si se ocultan
                 ppff2Section.querySelectorAll('input, select').forEach(function(element) {
                     element.required = false;
-                    element.value = ''; // Limpiar valores al ocultar
+                    element.value = ''; // Limpiar valores
                 });
             }
         });

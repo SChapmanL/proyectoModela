@@ -5,7 +5,7 @@ $conn = get_db_connection();
 $edit_mode = false;
 $nota_a_editar = null;
 
-// 4. Procesar Actualización
+// Procesar Actualización
 if (isset($_POST['update'])) {
     $idRegNota = $_POST['idRegNota'];
     $nota = $_POST['Nota'];
@@ -25,7 +25,7 @@ if (isset($_POST['update'])) {
     exit();
 }
 
-// 1. Insertar nueva nota
+// Insertar nueva nota
 if (isset($_POST['add'])) {
     $nota = $_POST['Nota'];
     $fechaEvaluacion = $_POST['FechaEvaluacion'];
@@ -44,7 +44,7 @@ if (isset($_POST['add'])) {
     exit();
 }
 
-// 3. Cargar datos para edición
+// Cargar datos para edición
 if (isset($_GET['edit'])) {
     $edit_mode = true;
     $idRegNota = $_GET['edit'];
@@ -60,7 +60,7 @@ if (isset($_GET['edit'])) {
 }
 
 
-// 2. Obtener notas registradas con nombres de estudiantes y cursos
+// Obtener notas registradas con nombres de estudiantes y cursos
 $notas = [];
 $sql_notas = "SELECT rn.idRegNota, rn.Nota, rn.FechaEvaluacion, rn.TipoEvaluacion, rn.Bimestre,
                      p_est.Nombres AS NombreEstudiante, p_est.Apellido_Paterno AS ApellidoEstudiante,
