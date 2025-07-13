@@ -4,6 +4,7 @@ $conn = get_db_connection();
 
 $edit_mode = false;
 $apoderado_a_editar = null;
+$trigger_error = '';
 
 // --- Lógica de Actualización ---
 if (isset($_POST['update'])) {
@@ -47,7 +48,11 @@ if (isset($_POST['update'])) {
         exit();
     } catch (Exception $e) {
         $conn->rollback();
-        $error = "Error al actualizar: " . $e->getMessage();
+        if (strpos($e->getMessage(), 'control_horario_persona') !== false) {
+            $trigger_error = $e->getMessage();
+        } else {
+            $error = "Error al actualizar: " . $e->getMessage();
+        }
     }
 }
 
@@ -192,5 +197,10 @@ $conn->close();
         
         <a href="index.php" class="back-button">Volver al Menú Principal</a>
     </div>
+    <script>
+        <?php if (!empty($trigger_error)): ?>
+        alert(<?= json_encode($trigger_error) ?>);
+        <?php endif; ?>
+    </script>
 </body>
 </html>

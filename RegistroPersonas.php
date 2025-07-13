@@ -1,6 +1,7 @@
 <?php
 require_once 'includes/funciones.php';
 $conn = get_db_connection();
+$trigger_error = '';
 
 if (isset($_POST['add_persona'])) {
     $conn->begin_transaction();
@@ -120,7 +121,11 @@ if (isset($_POST['add_persona'])) {
         exit();
     } catch (mysqli_sql_exception $e) {
         $conn->rollback();
-        echo "Error al registrar: " . $e->getMessage();
+        if (strpos($e->getMessage(), 'control_horario_persona') !== false) {
+            $trigger_error = $e->getMessage();
+        } else {
+            echo "Error al registrar: " . $e->getMessage();
+        }
     }
 }
 ?>
@@ -303,6 +308,10 @@ if (isset($_POST['add_persona'])) {
     </div>
 
     <script>
+        <?php if (!empty($trigger_error)): ?>
+        alert(<?= json_encode($trigger_error) ?>);
+        <?php endif; ?>
+
         document.getElementById('addPpffButton').addEventListener('click', function() {
             var ppff2Section = document.getElementById('ppff2Section');
             if (ppff2Section.style.display === 'none') {

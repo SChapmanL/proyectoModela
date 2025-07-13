@@ -3,6 +3,7 @@
 require_once 'includes/funciones.php';
 
 $conn = get_db_connection();
+$trigger_error = '';
 
 // para agilizar la busqueda en la combobox de secciones
 $secciones = [];
@@ -43,86 +44,96 @@ $idSeccion = '';
 
 // 1. INSERCION DE Empleados
 if (isset($_POST['add'])) {
-    // Persona data
-    $DNI = $_POST['DNI'] ?? '';
-    $Nombres = $_POST['Nombres'] ?? '';
-    $Apellido_Paterno = $_POST['Apellido_Paterno'] ?? '';
-    $Apellido_Materno = $_POST['Apellido_Materno'] ?? '';
-    $Direccion = $_POST['Direccion'] ?? '';
-    $Sexo = $_POST['Sexo'] ?? '';
-    $FechaNac = $_POST['FechaNac'] ?? '';
-    $Telefono = $_POST['Telefono'] ?? '';
-    $contactoEmergencia_idPersona = $_POST['contactoEmergencia_idPersona'] ?? null;
+    $conn->begin_transaction();
+    try {
+        // Persona data
+        $DNI = $_POST['DNI'] ?? '';
+        $Nombres = $_POST['Nombres'] ?? '';
+        $Apellido_Paterno = $_POST['Apellido_Paterno'] ?? '';
+        $Apellido_Materno = $_POST['Apellido_Materno'] ?? '';
+        $Direccion = $_POST['Direccion'] ?? '';
+        $Sexo = $_POST['Sexo'] ?? '';
+        $FechaNac = $_POST['FechaNac'] ?? '';
+        $Telefono = $_POST['Telefono'] ?? '';
+        $contactoEmergencia_idPersona = $_POST['contactoEmergencia_idPersona'] ?? null;
 
-    // No_Estudiante
-    $Correo = $_POST['Correo'] ?? '';
-    $GradoInstruccion = $_POST['GradoInstruccion'] ?? '';
+        // No_Estudiante
+        $Correo = $_POST['Correo'] ?? '';
+        $GradoInstruccion = $_POST['GradoInstruccion'] ?? '';
 
-    // Empleado
-    $CodEmpleado = $_POST['CodEmpleado'] ?? '';
-    $CondicionGrupoRiesgo = $_POST['CondicionGrupoRiesgo'] ?? '';
-    $Cargo = $_POST['Cargo'] ?? '';
-    $Salario = $_POST['Salario'] ?? '';
+        // Empleado
+        $CodEmpleado = $_POST['CodEmpleado'] ?? '';
+        $CondicionGrupoRiesgo = $_POST['CondicionGrupoRiesgo'] ?? '';
+        $Cargo = $_POST['Cargo'] ?? '';
+        $Salario = $_POST['Salario'] ?? '';
 
-    // Academico
-    $Modalidad = $_POST['Modalidad'] ?? '';
+        // Academico
+        $Modalidad = $_POST['Modalidad'] ?? '';
 
-    // Docente
-    $idSeccion = $_POST['idSeccion'] ?? null;
+        // Docente
+        $idSeccion = $_POST['idSeccion'] ?? null;
 
-    // Insert into Persona
-    $sql_persona = "INSERT INTO Persona (DNI, Nombres, Apellido_Paterno, Apellido_Materno, Direccion, Sexo, FechaNac, telefono, contactoEmergencia_idPersona) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt_persona = $conn->prepare($sql_persona);
-    $stmt_persona->bind_param("sssssssii", $DNI, $Nombres, $Apellido_Paterno, $Apellido_Materno, $Direccion, $Sexo, $FechaNac, $Telefono, $contactoEmergencia_idPersona);
-    $stmt_persona->execute();
-    $idPersona = $conn->insert_id; // obtener el ultimo id ingresado
-    $stmt_persona->close();
+        // Insert into Persona
+        $sql_persona = "INSERT INTO Persona (DNI, Nombres, Apellido_Paterno, Apellido_Materno, Direccion, Sexo, FechaNac, telefono, contactoEmergencia_idPersona) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt_persona = $conn->prepare($sql_persona);
+        $stmt_persona->bind_param("sssssssii", $DNI, $Nombres, $Apellido_Paterno, $Apellido_Materno, $Direccion, $Sexo, $FechaNac, $Telefono, $contactoEmergencia_idPersona);
+        $stmt_persona->execute();
+        $idPersona = $conn->insert_id; // obtener el ultimo id ingresado
+        $stmt_persona->close();
 
-    // Insert into No_Estudiante
-    $sql_no_estudiante = "INSERT INTO No_Estudiante (correo, gradoInstruccion, idPersona) VALUES (?, ?, ?)";
-    $stmt_no_estudiante = $conn->prepare($sql_no_estudiante);
-    $stmt_no_estudiante->bind_param("ssi", $Correo, $GradoInstruccion, $idPersona);
-    $stmt_no_estudiante->execute();
-    $stmt_no_estudiante->close();
+        // Insert into No_Estudiante
+        $sql_no_estudiante = "INSERT INTO No_Estudiante (correo, gradoInstruccion, idPersona) VALUES (?, ?, ?)";
+        $stmt_no_estudiante = $conn->prepare($sql_no_estudiante);
+        $stmt_no_estudiante->bind_param("ssi", $Correo, $GradoInstruccion, $idPersona);
+        $stmt_no_estudiante->execute();
+        $stmt_no_estudiante->close();
 
-    // Insert into Empleado
-    $sql_empleado = "INSERT INTO Empleado (codEmpleado, CondicionGrupoRiesgo, cargo, Salario, idPersona) VALUES (?, ?, ?, ?, ?)";
-    $stmt_empleado = $conn->prepare($sql_empleado);
-    $stmt_empleado->bind_param("sssdi", $CodEmpleado, $CondicionGrupoRiesgo, $Cargo, $Salario, $idPersona);
-    $stmt_empleado->execute();
-    $stmt_empleado->close();
+        // Insert into Empleado
+        $sql_empleado = "INSERT INTO Empleado (codEmpleado, CondicionGrupoRiesgo, cargo, Salario, idPersona) VALUES (?, ?, ?, ?, ?)";
+        $stmt_empleado = $conn->prepare($sql_empleado);
+        $stmt_empleado->bind_param("sssdi", $CodEmpleado, $CondicionGrupoRiesgo, $Cargo, $Salario, $idPersona);
+        $stmt_empleado->execute();
+        $stmt_empleado->close();
 
-    // Condicionales basados en el Cargo y sus diferentes opciones
-    if ($Cargo == 'Administrativo') {
-        $sql_administrativo = "INSERT INTO Administrativo (idPersona) VALUES (?)";
-        $stmt_administrativo = $conn->prepare($sql_administrativo);
-        $stmt_administrativo->bind_param("i", $idPersona);
-        $stmt_administrativo->execute();
-        $stmt_administrativo->close();
-    } elseif ($Cargo == 'Docente' || $Cargo == 'Auxiliar') {
-        $sql_academico = "INSERT INTO Academico (Modalidad, idPersona) VALUES (?, ?)";
-        $stmt_academico = $conn->prepare($sql_academico);
-        $stmt_academico->bind_param("si", $Modalidad, $idPersona);
-        $stmt_academico->execute();
-        $stmt_academico->close();
+        // Condicionales basados en el Cargo y sus diferentes opciones
+        if ($Cargo == 'Administrativo') {
+            $sql_administrativo = "INSERT INTO Administrativo (idPersona) VALUES (?)";
+            $stmt_administrativo = $conn->prepare($sql_administrativo);
+            $stmt_administrativo->bind_param("i", $idPersona);
+            $stmt_administrativo->execute();
+            $stmt_administrativo->close();
+        } elseif ($Cargo == 'Docente' || $Cargo == 'Auxiliar') {
+            $sql_academico = "INSERT INTO Academico (Modalidad, idPersona) VALUES (?, ?)";
+            $stmt_academico = $conn->prepare($sql_academico);
+            $stmt_academico->bind_param("si", $Modalidad, $idPersona);
+            $stmt_academico->execute();
+            $stmt_academico->close();
 
-        if ($Cargo == 'Docente') {
-            $sql_docente = "INSERT INTO Docente (idPersona, idSeccion) VALUES (?, ?)";
-            $stmt_docente = $conn->prepare($sql_docente);
-            $stmt_docente->bind_param("ii", $idPersona, $idSeccion);
-            $stmt_docente->execute();
-            $stmt_docente->close();
-        } elseif ($Cargo == 'Auxiliar') {
-            $sql_auxiliar = "INSERT INTO Auxiliar (idPersona, idSeccion) VALUES (?, ?)";
-            $stmt_auxiliar = $conn->prepare($sql_auxiliar);
-            $stmt_auxiliar->bind_param("ii", $idPersona, $idSeccion);
-            $stmt_auxiliar->execute();
-            $stmt_auxiliar->close();
+            if ($Cargo == 'Docente') {
+                $sql_docente = "INSERT INTO Docente (idPersona, idSeccion) VALUES (?, ?)";
+                $stmt_docente = $conn->prepare($sql_docente);
+                $stmt_docente->bind_param("ii", $idPersona, $idSeccion);
+                $stmt_docente->execute();
+                $stmt_docente->close();
+            } elseif ($Cargo == 'Auxiliar') {
+                $sql_auxiliar = "INSERT INTO Auxiliar (idPersona, idSeccion) VALUES (?, ?)";
+                $stmt_auxiliar = $conn->prepare($sql_auxiliar);
+                $stmt_auxiliar->bind_param("ii", $idPersona, $idSeccion);
+                $stmt_auxiliar->execute();
+                $stmt_auxiliar->close();
+            }
+        }
+        $conn->commit();
+        header('Location: Empleado.php'); // Redirect to refresh page
+        exit();
+    } catch (mysqli_sql_exception $e) {
+        $conn->rollback();
+        if (strpos($e->getMessage(), 'control_horario_persona') !== false) {
+            $trigger_error = $e->getMessage();
+        } else {
+            echo "Error al registrar: " . $e->getMessage();
         }
     }
-
-    header('Location: Empleado.php'); // Redirect to refresh page
-    exit();
 }
 
 // 2. Read/Fetch Empleado for Update
@@ -517,5 +528,10 @@ $conn->close();
             <a href="index.php" class="back-button">Volver al Menú Principal</a>
         </div>
     </div>
+    <script>
+        <?php if (!empty($trigger_error)): ?>
+        alert(<?= json_encode($trigger_error) ?>);
+        <?php endif; ?>
+    </script>
 </body>
 </html>
