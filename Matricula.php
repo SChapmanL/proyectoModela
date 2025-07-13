@@ -1,4 +1,5 @@
 <?php
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 require_once 'includes/funciones.php';
 $conn = get_db_connection();
 
@@ -24,13 +25,18 @@ if (isset($_POST['registrar'])) {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("sii", $fecha, $idPersona, $idSeccion);
     
-    if ($stmt->execute()) {
-        header('Location: Matricula.php');
-        exit();
-    } else {
-        $error = "Error al registrar la matrícula: " . $conn->error;
+    try {
+        if ($stmt->execute()) {
+            header('Location: Matricula.php');
+            exit();
+        } else {
+            $error = "Error al registrar la matrícula: " . $conn->error;
+        }
+    } catch (mysqli_sql_exception $e) {
+        $error = $e->getMessage();
+    } finally {
+        $stmt->close();
     }
-    $stmt->close();
 }
 
 // 3. Obtener estudiantes NO matriculados
