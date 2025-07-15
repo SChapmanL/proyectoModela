@@ -21,6 +21,7 @@ if (isset($_POST['update'])) {
     $parentesco = $_POST['Parentesco'];
     $viveConEstudiante = $_POST['viveConEstudiante'];
 
+    //UPDATES
     $conn->begin_transaction();
     try {
         $sql_persona = "UPDATE persona SET Nombres=?, Apellido_Paterno=?, Apellido_Materno=?, DNI=?, Direccion=?, telefono=? WHERE idPersona=?";
@@ -48,6 +49,7 @@ if (isset($_POST['update'])) {
         exit();
     } catch (Exception $e) {
         $conn->rollback();
+        // TRIGGER de Horario
         if (strpos($e->getMessage(), 'control_horario_persona') !== false) {
             $trigger_error = $e->getMessage();
         } else {
@@ -60,6 +62,7 @@ if (isset($_POST['update'])) {
 if (isset($_GET['edit'])) {
     $edit_mode = true;
     $idPersonaApoderado = $_GET['edit'];
+    // SELECT para la pantalla de edicion
     $sql_edit = "SELECT p.*, ne.correo, ne.gradoInstruccion, ppff.Ocupacion, a.Parentesco, a.viveConEstudiante 
                  FROM persona p
                  JOIN No_Estudiante ne ON p.idPersona = ne.idPersona
@@ -78,6 +81,7 @@ if (isset($_GET['edit'])) {
 
 // --- Obtener lista de Apoderados ---
 $apoderados = [];
+// SELECT DE TABLA APODERADO
 $sql = "SELECT 
             p_apoderado.idPersona AS idPersonaApoderado,
             p_apoderado.Nombres AS NombresApoderado,

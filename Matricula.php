@@ -69,6 +69,7 @@ while ($row = $result->fetch_assoc()) {
 }
 
 // 5. Obtener matrículas registradas
+// SELECT de matriculas registrados
 $matriculas = [];
 $sqlMatriculas = "SELECT m.idMatricula, m.fechaMatricula,
                          p.Nombres, p.Apellido_Paterno, p.Apellido_Materno,
